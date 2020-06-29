@@ -31,11 +31,11 @@ const item2 = new Item({
   name: 'Create your first Todo'
 });
 const list1 = new List({
-  name: 'home',
+  name: '',
   items: item1
 });
 const list2 = new List({
-  name: 'home',
+  name: '',
   items: item2
 });
 const defaltitems = [item1, item2];
@@ -183,7 +183,7 @@ app.get("/other", function(req, res) {
 
 app.post("/", function(req, res) {
   itemName = req.body.newItem;
-  listName = "home";
+  listName = "";
   const item = new Item({
     name: itemName
   });
