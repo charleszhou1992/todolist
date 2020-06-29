@@ -51,7 +51,7 @@ app.use(express.static("public"));
 
 
 //home route
-app.get("/home", function(req, res) {
+app.get("/", function(req, res) {
 
   var today = new Date();
 
@@ -78,7 +78,7 @@ app.get("/home", function(req, res) {
           console.log("Success");
         }
       });
-      res.redirect("/home");
+      res.redirect("/");
     } else {
       res.render("home", {
         day: day,
@@ -181,7 +181,7 @@ app.get("/other", function(req, res) {
 });
 
 
-app.post("/home", function(req, res) {
+app.post("/", function(req, res) {
   itemName = req.body.newItem;
   listName = "home";
   const item = new Item({
@@ -194,7 +194,7 @@ app.post("/home", function(req, res) {
   list.save();
   console.log(list);
 
-  res.redirect("/home");
+  res.redirect("/");
 });
 
 app.post("/work", function(req, res) {

@@ -16,7 +16,7 @@
   </div>
 
   <form class="" action="index.html" method="post">
-    <a class="btn btn-primary active" href="/home" role="button" aria-pressed="true">Home</a>
+    <a class="btn btn-primary active" href="/" role="button" aria-pressed="true">Home</a>
     <a class="btn btn-primary" href="/work" role="button">Work</a>
     <a class="btn btn-primary" href="/other" role="button">Other</a>
 
@@ -28,7 +28,7 @@
 
 
 
-    <%if (list.name === "home"){%>
+    <%if (list.name === ""){%>
     <form class="" action="/delete" method="post">
       <div class="items">
         <input type="checkbox" name="checkbox" value="<%= list._id%>" onchange="this.form.submit()">
@@ -42,7 +42,7 @@
 
     <% }) %>
 
-    <form class="items" action="/home" method="post">
+    <form class="items" action="/" method="post">
       <input type="text" name="newItem" placeholder="New Main Item">
       <button class="btn btn-secondary"type="submit" name="button">Add</button>
     </form>
