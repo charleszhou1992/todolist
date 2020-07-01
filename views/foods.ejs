@@ -16,8 +16,8 @@
   </div>
 
 <form class="" action="index.html" method="post">
-  <a class="btn btn-primary" href="/" role="button">Home</a>
-  <a class="btn btn-primary active" href="/work" role="button" aria-pressed="true">Work</a>
+  <a class="btn btn-primary" href="/" role="button">Runs</a>
+  <a class="btn btn-primary active" href="/foods" role="button" aria-pressed="true">Foods</a>
   <a class="btn btn-primary" href="/other" role="button">Other</a>
 </form>
 
@@ -25,7 +25,7 @@
   <div class="box">
     <% lists.forEach(function(list){ %>
 
-        <%if (list.name === "work"){%>
+        <%if (list.name === "foods"){%>
           <form class="" action="/delete" method="post">
             <div class="items">
               <input type="checkbox" name="checkbox" value="<%= list._id%>" onchange="this.form.submit()">
@@ -37,8 +37,8 @@
     <% }) %>
 
 
-    <form class="items" action="/work" method="post">
-      <input type="text" name="newItem" placeholder="New Work Item">
+    <form class="items" action="/foods" method="post">
+      <input type="text" name="newItem" placeholder="New Intake">
       <button class="btn btn-secondary"type="submit" name="button">Add</button>
     </form>
   </div>

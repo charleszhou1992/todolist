@@ -28,7 +28,7 @@ const item1 = new Item({
   name: 'Welcome'
 });
 const item2 = new Item({
-  name: 'Create your first Todo'
+  name: 'Beat yesterday'
 });
 const list1 = new List({
   name: '',
@@ -51,184 +51,138 @@ app.use(express.static("public"));
 
 
 //home route
-app.get("/", function(req, res) {
+app.route("/")
+  .get(function(req, res) {
 
-  var today = new Date();
+    var today = new Date();
 
-  var options = {
-    weekday: "long",
-    day: "numeric",
-    month: "long"
-  };
+    var options = {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    };
 
-  var day = today.toLocaleDateString("en-US", options);
+    var day = today.toLocaleDateString("en-US", options);
 
-  const defaltlists = [list1, list2];
+    const defaltlists = [list1, list2];
 
-  List.find({}, function(err, lists) {
+    List.find({}, function(err, lists) {
 
-    if (lists.length === 0) {
+      if (lists.length === 0) {
 
-      //insert defalt data to database
-      List.insertMany(defaltlists, function(err) {
+        //insert defalt data to database
+        List.insertMany(defaltlists, function(err) {
 
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Success");
-        }
-      });
-      res.redirect("/");
-    } else {
-      res.render("home", {
-        day: day,
-        lists: lists
-      });
-    }
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Success");
+          }
+        });
+        res.redirect("/");
+      } else {
+        res.render("runs", {
+          day: day,
+          lists: lists
+        });
+      }
 
+    });
+  })
+  .post(function(req, res) {
+    itemName = req.body.newItem;
+    listName = "";
+    const item = new Item({
+      name: itemName
+    });
+    const list = new List({
+      name: listName,
+      items: item
+    });
+    list.save();
+    console.log(list);
+
+    res.redirect("/");
   });
-});
+
 
 //work routes
-app.get("/work", function(req, res) {
+app.route("/foods")
+  .get(function(req, res) {
 
-  var today = new Date();
+    var today = new Date();
 
-  var options = {
-    weekday: "long",
-    day: "numeric",
-    month: "long"
-  };
+    var options = {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    };
 
-  var day = today.toLocaleDateString("en-US", options);
+    var day = today.toLocaleDateString("en-US", options);
 
-  const list1 = new List({
-    name: 'work',
-    items: item1
-  });
-  const list2 = new List({
-    name: 'work',
-    items: item2
-  });
-  const defaltitems = [item1, item2];
-
-  List.find({}, function(err, lists) {
-    if (lists.length === 0) {
-
-      //insert defalt data to database
-      List.insertMany(defaltlists, function(err) {
-
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Success");
-        }
-      });
-      res.redirect("/work");
-    } else {
-      res.render("work", {
+    List.find({}, function(err, lists) {
+      res.render("foods", {
         day: day,
         lists: lists
       });
-    }
+    });
+  })
+  .post(function(req, res) {
+    itemName = req.body.newItem;
+    listName = "foods";
+    const item = new Item({
+      name: itemName
+    });
+    const list = new List({
+      name: listName,
+      items: item
+    });
+    list.save();
+    console.log(list);
+
+    res.redirect("/foods");
   });
-});
 
 
-//other routes
-app.get("/other", function(req, res) {
+//other route
+app.route("/other")
+  .get(function(req, res) {
 
-  var today = new Date();
+    var today = new Date();
 
-  var options = {
-    weekday: "long",
-    day: "numeric",
-    month: "long"
-  };
+    var options = {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    };
 
-  var day = today.toLocaleDateString("en-US", options);
+    var day = today.toLocaleDateString("en-US", options);
 
-  const list1 = new List({
-    name: 'other',
-    items: item1
-  });
-  const list2 = new List({
-    name: 'other',
-    items: item2
-  });
-  const defaltitems = [item1, item2];
-
-  List.find({}, function(err, lists) {
-    if (lists.length === 0) {
-
-      //insert defalt data to database
-      List.insertMany(defaltlists, function(err) {
-
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Success");
-        }
-      });
-      res.redirect("/other");
-    } else {
+    List.find({}, function(err, lists) {
       res.render("other", {
         day: day,
         lists: lists
       });
-    }
+    });
+  })
+  .post(function(req, res) {
+    itemName = req.body.newItem;
+    listName = "other";
+    const item = new Item({
+      name: itemName
+    });
+    const list = new List({
+      name: listName,
+      items: item
+    });
+    list.save();
+    console.log(list);
+
+    res.redirect("/other");
   });
-});
 
 
-app.post("/", function(req, res) {
-  itemName = req.body.newItem;
-  listName = "";
-  const item = new Item({
-    name: itemName
-  });
-  const list = new List({
-    name: listName,
-    items: item
-  });
-  list.save();
-  console.log(list);
-
-  res.redirect("/");
-});
-
-app.post("/work", function(req, res) {
-  itemName = req.body.newItem;
-  listName = "work";
-  const item = new Item({
-    name: itemName
-  });
-  const list = new List({
-    name: listName,
-    items: item
-  });
-  list.save();
-  console.log(list);
-
-  res.redirect("/work");
-});
-
-app.post("/other", function(req, res) {
-  itemName = req.body.newItem;
-  listName = "other";
-  const item = new Item({
-    name: itemName
-  });
-  const list = new List({
-    name: listName,
-    items: item
-  });
-  list.save();
-  console.log(list);
-
-  res.redirect("/other");
-});
-
+//delete route
 app.post("/delete", function(req, res) {
   var deleteListId = req.body.checkbox;
   var deleteListName;
@@ -240,6 +194,8 @@ app.post("/delete", function(req, res) {
 
 });
 
+
+//ports
 let port = process.env.PORT;
 if (port == null || port == "") {
   port = 3000;
