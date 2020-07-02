@@ -15,7 +15,7 @@ h1 {
 body{
   background-color: transparent;
 }
-.navbar {
+/* .navbar {
     padding-top: 15px;
     padding-bottom: 15px;
     border: 0;
@@ -23,11 +23,19 @@ body{
     margin-bottom: 0;
     font-size: 12px;
     letter-spacing: 5px;
-}
+} */
 
 
 .box {
-  max-width: 400px;
+  max-width: 500px;
+  margin: 50px auto;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 5px 5px 15px -5px rgba(0, 0, 0, 0.3);
+}
+
+.box2 {
+  max-width: 430px;
   margin: 50px auto;
   background: white;
   border-radius: 5px;

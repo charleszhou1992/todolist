@@ -10,7 +10,7 @@
   </head>
 
   <body>
-
+<%- include('partials/header'); -%>
     <div class="box" id="heading">
       <h1>
         <%= day %>
@@ -23,7 +23,7 @@
       <a class="btn btn-primary active" href="/other" role="button" aria-pressed="true">Other</a>
     </form>
 
-    <div class="box">
+    <div class="box2">
       <% lists.forEach(function(list){ %>
 
         <%if (list.name === "other"){%>
@@ -38,7 +38,7 @@
         <% }) %>
 
           <form class="items" action="/other" method="post">
-            <input type="text" name="newItem" placeholder="Other">
+            <input type="text" name="newItem" placeholder="Other Item">
             <button class="btn btn-secondary"type="submit" name="button">Add</button>
           </form>
         </div>

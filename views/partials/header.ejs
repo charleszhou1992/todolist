@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="/">My Fitness</a>
+
+  <!-- Links -->
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" href="/about">About</a>
+    </li>
+
+    <!-- Dropdown -->
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+        Check Histroy
+      </a>
+
+      <%var dateArray = [];%>
+
+
+      <%lists.forEach(function(list){%>
+        <%dateArray.push(list.date);%>
+      <%});%>
+
+      <%if (dateArray.length === 1){%>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#"><%=dateArray[0]%></a>
+        </div>
+      <%}else{%>
+
+        <%dateArray.forEach(function(date, index){%>
+
+          <%if (index > 0){%>
+            <%if (date !== dateArray[index-1]){%>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#"><%=date%></a>
+              </div>
+            <%}else{%>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#"><%=date%></a>
+              </div>
+            <%}%>
+          <%}%>
+
+        <%})%>
+      <%}%>
+
+    </li>
+  </ul>
+</nav>

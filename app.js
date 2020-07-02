@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 
+var day;
 //mongodb setup
 mongoose.connect("mongodb://charles_chou:112358@cluster0-shard-00-00-kfhsi.mongodb.net:27017,cluster0-shard-00-01-kfhsi.mongodb.net:27017,cluster0-shard-00-02-kfhsi.mongodb.net:27017/todolistDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority", {
   useNewUrlParser: true,
@@ -16,7 +17,14 @@ const itemsSchema = new mongoose.Schema({
 
 const Item = mongoose.model('Item', itemsSchema);
 
+const logDateSchema = new mongoose.Schema({
+  date: String
+});
+
+const LogDate = mongoose.model("LogDate", logDateSchema);
+
 const listsSchema = new mongoose.Schema({
+  date: String,
   name: String,
   items: [itemsSchema]
 })
@@ -24,21 +32,6 @@ const listsSchema = new mongoose.Schema({
 const List = mongoose.model('List', listsSchema);
 //mongodb setup
 
-const item1 = new Item({
-  name: 'Welcome'
-});
-const item2 = new Item({
-  name: 'Beat yesterday'
-});
-const list1 = new List({
-  name: '',
-  items: item1
-});
-const list2 = new List({
-  name: '',
-  items: item2
-});
-const defaltitems = [item1, item2];
 
 //use ejs as view engine
 app.set('view engine', 'ejs');
@@ -49,53 +42,55 @@ app.use(bodyparser.urlencoded({
 
 app.use(express.static("public"));
 
+function getDate(){
+  var today = new Date();
+
+  var options = {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  };
+
+  day = today.toLocaleDateString("en-US", options);
+};
+
+//about route
+app.route("/about")
+.get(function(req, res) {
+
+  getDate();
+
+  List.find({}, function(err, lists) {
+    res.render("about", {
+      day: day,
+      lists: lists
+    });
+  });
+});
+
 
 //home route
 app.route("/")
   .get(function(req, res) {
-
-    var today = new Date();
-
-    var options = {
-      weekday: "long",
-      day: "numeric",
-      month: "long"
-    };
-
-    var day = today.toLocaleDateString("en-US", options);
-
-    const defaltlists = [list1, list2];
+    getDate();
 
     List.find({}, function(err, lists) {
-
-      if (lists.length === 0) {
-
-        //insert defalt data to database
-        List.insertMany(defaltlists, function(err) {
-
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Success");
-          }
-        });
-        res.redirect("/");
-      } else {
-        res.render("runs", {
-          day: day,
-          lists: lists
-        });
-      }
-
+      res.render("runs", {
+        day: day,
+        lists: lists
+      });
     });
   })
   .post(function(req, res) {
+    getDate();
     itemName = req.body.newItem;
     listName = "";
     const item = new Item({
       name: itemName
     });
     const list = new List({
+      date: day,
       name: listName,
       items: item
     });
@@ -110,15 +105,7 @@ app.route("/")
 app.route("/foods")
   .get(function(req, res) {
 
-    var today = new Date();
-
-    var options = {
-      weekday: "long",
-      day: "numeric",
-      month: "long"
-    };
-
-    var day = today.toLocaleDateString("en-US", options);
+    getDate();
 
     List.find({}, function(err, lists) {
       res.render("foods", {
@@ -134,6 +121,7 @@ app.route("/foods")
       name: itemName
     });
     const list = new List({
+      date: day,
       name: listName,
       items: item
     });
@@ -148,15 +136,7 @@ app.route("/foods")
 app.route("/other")
   .get(function(req, res) {
 
-    var today = new Date();
-
-    var options = {
-      weekday: "long",
-      day: "numeric",
-      month: "long"
-    };
-
-    var day = today.toLocaleDateString("en-US", options);
+    getDate();
 
     List.find({}, function(err, lists) {
       res.render("other", {
@@ -172,6 +152,7 @@ app.route("/other")
       name: itemName
     });
     const list = new List({
+      date: day,
       name: listName,
       items: item
     });
