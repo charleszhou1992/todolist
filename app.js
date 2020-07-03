@@ -69,6 +69,20 @@ app.route("/about")
   });
 });
 
+//hostory
+app.route("/history")
+.get(function(req, res) {
+
+  getDate();
+
+  List.find({}, function(err, lists) {
+    res.render("history", {
+      day: day,
+      lists: lists
+    });
+  });
+});
+
 
 //home route
 app.route("/")
