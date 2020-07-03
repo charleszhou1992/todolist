@@ -26,23 +26,26 @@
           <a class="dropdown-item" href="#"><%=dateArray[0]%></a>
         </div>
       <%}else{%>
-
+        <div class="dropdown-menu">
         <%dateArray.forEach(function(date, index){%>
 
           <%if (index > 0){%>
             <%if (date !== dateArray[index-1]){%>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#"><%=date%></a>
-              </div>
-            <%}else{%>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#"><%=date%></a>
-              </div>
-            <%}%>
-          <%}%>
 
-        <%})%>
-      <%}%>
+                <a class="dropdown-item" href="/history"><%=dateArray[index-1]%></a>
+
+            <%};%>
+            <%if (index + 1 === dateArray.length){%>
+
+              <a class="dropdown-item" href="/history"><%=dateArray[index]%></a>
+
+            <%};%>
+          <%};%>
+
+
+        <%});%>
+        </div>
+      <%};%>
 
     </li>
   </ul>
