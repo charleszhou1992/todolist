@@ -32,12 +32,12 @@
           <%if (index > 0){%>
             <%if (date !== dateArray[index-1]){%>
                 <form class="historyform" action="/history" method="POST">
-                  <a class="dropdown-item" href="/history" id="historyDate"><%=dateArray[index-1]%></a>
+                  <a class="dropdown-item" href="/history/<%=dateArray[index-1]%>" ><%=dateArray[index-1]%></a>
                 </form>
             <%};%>
             <%if (index + 1 === dateArray.length){%>
               <form class="historyform" action="/history" method="POST">
-                <a class="dropdown-item" href="/history" id="historyDate"><%=dateArray[index]%></a>
+                <a class="dropdown-item" href="/history/<%=dateArray[index-1]%>" ><%=dateArray[index]%></a>
               </form>
             <%};%>
           <%};%>

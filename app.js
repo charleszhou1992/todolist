@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const app = express();
 
 var day;
+var dateData;
 //mongodb setup
 mongoose.connect("mongodb://charles_chou:112358@cluster0-shard-00-00-kfhsi.mongodb.net:27017,cluster0-shard-00-01-kfhsi.mongodb.net:27017,cluster0-shard-00-02-kfhsi.mongodb.net:27017/todolistDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority", {
   useNewUrlParser: true,
@@ -55,6 +56,8 @@ function getDate(){
   day = today.toLocaleDateString("en-US", options);
 };
 
+
+
 //about route
 app.route("/about")
 .get(function(req, res) {
@@ -70,16 +73,17 @@ app.route("/about")
 });
 
 //hostory
-app.route("/history")
+app.route("/history/:data")
 .get(function(req, res) {
   getDate();
-  var history = req.historyDate;
-  console.log(res);
+  dateData = req.params.data;
+  console.log(dateData);
 
   List.find({}, function(err, lists) {
     res.render("history", {
       day: day,
-      lists: lists
+      lists: lists,
+      dateData: dateData
     });
   });
 })

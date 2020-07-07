@@ -9,8 +9,30 @@
   <body>
     <%- include('partials/header'); -%>
     <div class="box" id="heading">
-      <h1> <%= day %> </h1>
+      <h1> <%= dateData %> </h1>
       
+    </div>
+
+    <div class="box2"> 
+
+      <% lists.forEach(function(list){ %>
+
+
+
+        <%if (list.date === dateData){%>
+        <form class="" action="/delete" method="post">
+          <div class="items">
+            <input type="checkbox" name="checkbox" value="<%= list._id%>" onchange="this.form.submit()">
+            <p><%= list.items[0].name %></p>
+          </div>
+        </form>
+        <%}%>
+    
+    
+    
+    
+        <% }) %>
+
     </div>
 
 
