@@ -72,8 +72,9 @@ app.route("/about")
 //hostory
 app.route("/history")
 .get(function(req, res) {
-
   getDate();
+  var history = req.historyDate;
+  console.log(res);
 
   List.find({}, function(err, lists) {
     res.render("history", {
@@ -81,7 +82,7 @@ app.route("/history")
       lists: lists
     });
   });
-});
+})
 
 
 //home route
@@ -97,7 +98,7 @@ app.route("/")
     });
   })
   .post(function(req, res) {
-    getDate();
+
     itemName = req.body.newItem;
     listName = "";
     const item = new Item({
