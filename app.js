@@ -56,7 +56,44 @@ function getDate(){
   day = today.toLocaleDateString("en-US", options);
 };
 
+//beginning
+app.route("/")
+  .get(function(req, res) {
+    getDate();
 
+    List.find({}, function(err, lists) {
+      res.render("biginning", {
+        day: day,
+        lists: lists
+      });
+    });
+  })
+
+//registration route
+app.route("/register")
+  .get(function(req, res) {
+    getDate();
+
+    List.find({}, function(err, lists) {
+      res.render("register", {
+        day: day,
+        lists: lists
+      });
+    });
+  })
+
+//login route
+app.route("/login")
+  .get(function(req, res) {
+    getDate();
+
+    List.find({}, function(err, lists) {
+      res.render("login", {
+        day: day,
+        lists: lists
+      });
+    });
+  })
 
 //about route
 app.route("/about")
@@ -90,7 +127,7 @@ app.route("/history/:data")
 
 
 //home route
-app.route("/")
+app.route("/runs")
   .get(function(req, res) {
     getDate();
 
@@ -116,7 +153,7 @@ app.route("/")
     list.save();
     console.log(list);
 
-    res.redirect("/");
+    res.redirect("/runs");
   });
 
 
@@ -189,7 +226,7 @@ app.post("/delete", function(req, res) {
 
   List.findByIdAndDelete(deleteListId, function(err, list) {
     deleteListName = list.name;
-    res.redirect("/" + deleteListName);
+    res.redirect("/runs" + deleteListName);
   });
 
 });
