@@ -1,16 +1,47 @@
+
 const express = require("express");
 const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const findOrCreate = require('mongoose-findorcreate');
+const session = require('express-session');
+const passport = require('passport');
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const app = express();
 
 var day;
 var dateData;
+var email;
+var password;
+var historySwich = false;
+
+app.use(session({
+  secret: "Todolist",
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 //mongodb setup
 mongoose.connect("mongodb://charles_chou:112358@cluster0-shard-00-00-kfhsi.mongodb.net:27017,cluster0-shard-00-01-kfhsi.mongodb.net:27017,cluster0-shard-00-02-kfhsi.mongodb.net:27017/todolistDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
+mongoose.set("useCreateIndex", true);
+
+const userSchema = new mongoose.Schema({
+  email: String,
+  password: String
+});
+
+
+userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
+
+const User = mongoose.model('User', userSchema);
 
 const itemsSchema = new mongoose.Schema({
   name: String
@@ -25,6 +56,7 @@ const logDateSchema = new mongoose.Schema({
 const LogDate = mongoose.model("LogDate", logDateSchema);
 
 const listsSchema = new mongoose.Schema({
+  users: [userSchema],
   date: String,
   name: String,
   items: [itemsSchema]
@@ -56,6 +88,32 @@ function getDate(){
   day = today.toLocaleDateString("en-US", options);
 };
 
+passport.use(User.createStrategy());
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
+
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.CLIENT_ID,
+//   clientSecret: process.env.CLIENT_SECRET,
+//   callbackURL: "http://localhost:3000/auth/google/Todolist",
+//   userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
+// },
+// function(accessToken, refreshToken, profile, cb) {
+//   User.findOrCreate({ googleId: profile.id }, function (err, user) {
+//     return cb(err, user);
+//   });
+// }
+// ));
+
 //beginning
 app.route("/")
   .get(function(req, res) {
@@ -81,6 +139,20 @@ app.route("/register")
       });
     });
   })
+  .post(function(req, res){
+    email = req.body.username;
+    password = req.body.password;
+    User.register({username: email}, password, function(err, user){
+      if (err) {
+        console.log(err);
+        res.redirect("/register");
+      } else {
+        passport.authenticate("local")(req, res, function(){
+          res.redirect("/runs");
+        });
+      }
+    });
+  });
 
 //login route
 app.route("/login")
@@ -94,6 +166,25 @@ app.route("/login")
       });
     });
   })
+  .post(function(req, res){
+    email = req.body.username;
+    password = req.body.password;
+    const user = new User({
+      username: email,
+      password: password
+    });
+  
+    req.login(user, function(err){
+      if (err) {
+        console.log(err);
+      } else {
+        passport.authenticate("local")(req, res, function(){
+          res.redirect("/runs");
+        });
+      }
+    });
+
+  });
 
 //about route
 app.route("/about")
@@ -112,6 +203,7 @@ app.route("/about")
 //hostory
 app.route("/history/:data")
 .get(function(req, res) {
+  historySwich = true;
   getDate();
   dateData = req.params.data;
   console.log(dateData);
@@ -129,7 +221,10 @@ app.route("/history/:data")
 //home route
 app.route("/runs")
   .get(function(req, res) {
-    getDate();
+    historySwich = false;
+
+    if (req.isAuthenticated){
+      getDate();
 
     List.find({}, function(err, lists) {
       res.render("runs", {
@@ -137,15 +232,26 @@ app.route("/runs")
         lists: lists
       });
     });
+
+    }else{
+      res.redirect("/login");
+    }
+    
   })
   .post(function(req, res) {
 
     itemName = req.body.newItem;
     listName = "";
+
+    const user = new User({
+      email: email,
+      password: password
+    });
     const item = new Item({
       name: itemName
     });
     const list = new List({
+      users: user,
       date: day,
       name: listName,
       items: item
@@ -160,6 +266,7 @@ app.route("/runs")
 //work routes
 app.route("/foods")
   .get(function(req, res) {
+    historySwich = false;
 
     getDate();
 
@@ -173,10 +280,15 @@ app.route("/foods")
   .post(function(req, res) {
     itemName = req.body.newItem;
     listName = "foods";
+    const user = new User({
+      email: email,
+      password: password
+    });
     const item = new Item({
       name: itemName
     });
     const list = new List({
+      users: user,
       date: day,
       name: listName,
       items: item
@@ -191,6 +303,7 @@ app.route("/foods")
 //other route
 app.route("/other")
   .get(function(req, res) {
+    historySwich = false;
 
     getDate();
 
@@ -204,10 +317,15 @@ app.route("/other")
   .post(function(req, res) {
     itemName = req.body.newItem;
     listName = "other";
+    const user = new User({
+      email: email,
+      password: password
+    });
     const item = new Item({
       name: itemName
     });
     const list = new List({
+      users: user,
       date: day,
       name: listName,
       items: item
@@ -226,7 +344,14 @@ app.post("/delete", function(req, res) {
 
   List.findByIdAndDelete(deleteListId, function(err, list) {
     deleteListName = list.name;
-    res.redirect("/runs" + deleteListName);
+    if (deleteListName === "" && historySwich == false){
+      res.redirect("/runs");
+    }else if (deleteListName.length == 5 && historySwich == false){
+      res.redirect("/" + deleteListName);
+    }else{
+      res.redirect("/history/" + dateData);
+    }
+    
   });
 
 });
