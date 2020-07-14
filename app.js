@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 const express = require("express");
 const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
@@ -14,6 +14,7 @@ var day;
 var dateData;
 var email;
 var password;
+var profileId;
 var historySwich = false;
 
 app.use(session({
@@ -34,7 +35,8 @@ mongoose.set("useCreateIndex", true);
 
 const userSchema = new mongoose.Schema({
   email: String,
-  password: String
+  password: String,
+  googleId: String
 });
 
 
@@ -100,19 +102,20 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-
-// passport.use(new GoogleStrategy({
-//   clientID: process.env.CLIENT_ID,
-//   clientSecret: process.env.CLIENT_SECRET,
-//   callbackURL: "http://localhost:3000/auth/google/Todolist",
-//   userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
-// },
-// function(accessToken, refreshToken, profile, cb) {
-//   User.findOrCreate({ googleId: profile.id }, function (err, user) {
-//     return cb(err, user);
-//   });
-// }
-// ));
+//google login
+passport.use(new GoogleStrategy({
+  clientID: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/google/runs",
+  userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
+},
+function(accessToken, refreshToken, profile, cb) {
+  User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    profileId = profile.id;
+    return cb(err, user);
+  });
+}
+));
 
 //beginning
 app.route("/")
@@ -171,7 +174,8 @@ app.route("/login")
     password = req.body.password;
     const user = new User({
       username: email,
-      password: password
+      password: password,
+      googleId: profileId
     });
   
     req.login(user, function(err){
@@ -185,6 +189,23 @@ app.route("/login")
     });
 
   });
+
+app.get("/auth/google",
+  passport.authenticate('google', { scope: ["profile"] })
+);
+
+app.get("/auth/google/runs",
+  passport.authenticate('google', { failureRedirect: "/login" }),
+  function(req, res) {
+    res.redirect("/runs");
+  });
+
+app.get("/logout", function(req, res){
+  email = "";
+  profileId = "";
+  req.logout();
+  res.redirect("/");
+});
 
 //about route
 app.route("/about")
@@ -229,7 +250,9 @@ app.route("/runs")
     List.find({}, function(err, lists) {
       res.render("runs", {
         day: day,
-        lists: lists
+        lists: lists,
+        email: email,
+        profileId: profileId
       });
     });
 
@@ -245,7 +268,8 @@ app.route("/runs")
 
     const user = new User({
       email: email,
-      password: password
+      password: password,
+      googleId: profileId
     });
     const item = new Item({
       name: itemName
@@ -273,7 +297,9 @@ app.route("/foods")
     List.find({}, function(err, lists) {
       res.render("foods", {
         day: day,
-        lists: lists
+        lists: lists,
+        email: email,
+        profileId: profileId
       });
     });
   })
@@ -282,7 +308,8 @@ app.route("/foods")
     listName = "foods";
     const user = new User({
       email: email,
-      password: password
+      password: password,
+      googleId: profileId
     });
     const item = new Item({
       name: itemName
@@ -310,7 +337,9 @@ app.route("/other")
     List.find({}, function(err, lists) {
       res.render("other", {
         day: day,
-        lists: lists
+        lists: lists,
+        email: email,
+        profileId: profileId
       });
     });
   })
@@ -319,7 +348,8 @@ app.route("/other")
     listName = "other";
     const user = new User({
       email: email,
-      password: password
+      password: password,
+      googleId: profileId
     });
     const item = new Item({
       name: itemName

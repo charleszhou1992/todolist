@@ -29,7 +29,7 @@
 
 
 
-    <%if (list.name === ""){%>
+    <%if (list.name === "" && list.date == day && (list.users[0].email == email || list.users[0].googleId == profileId)){%>
     <form class="" action="/delete" method="post">
       <div class="items">
         <input type="checkbox" name="checkbox" value="<%= list._id%>" onchange="this.form.submit()">
